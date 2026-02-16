@@ -1,5 +1,6 @@
 package org.example;
 
+import Models.AssignmentMetadata;
 import Models.Permission;
 import Models.Role;
 import Models.User;
@@ -266,6 +267,89 @@ public class Main {
         System.out.println("  ID: " + restoredRole.id());
         System.out.println("  Name: " + restoredRole.name());
         System.out.println("  Permissions count: " + restoredRole.permissions().size());
+
+
+        System.out.println("=== Testing AssignmentMetadata Record ===\n");
+
+        System.out.println("Test 1: Creating metadata with reason");
+        AssignmentMetadata meta1 = AssignmentMetadata.now("admin", "Initial role assignment");
+        System.out.println("OK - Created with reason:");
+        System.out.println(meta1.format());
+        System.out.println();
+
+        System.out.println("Test 2: Creating metadata without reason");
+        AssignmentMetadata meta2 = AssignmentMetadata.now("john_doe", null);
+        System.out.println("OK - Created without reason:");
+        System.out.println(meta2.format());
+        System.out.println();
+
+        System.out.println("Test 3: Creating metadata with empty reason string");
+        AssignmentMetadata meta3 = AssignmentMetadata.now("manager", "");
+        System.out.println("OK - Created with empty reason:");
+        System.out.println(meta3.format());
+        System.out.println();
+
+        System.out.println("Test 4: Creating metadata with custom date");
+        AssignmentMetadata meta4 = new AssignmentMetadata("admin", "2026-02-15 10:30:00", "Custom date test");
+        System.out.println("OK - Created with custom date:");
+        System.out.println(meta4.format());
+        System.out.println();
+
+        System.out.println("Test 5: Validation tests");
+        try {
+            new AssignmentMetadata(null, "2026-02-15 10:30:00", "Test");
+            System.out.println("FAIL - Should have thrown exception for null assignedBy");
+        } catch (IllegalArgumentException e) {
+            System.out.println("OK - Null assignedBy validation: " + e.getMessage());
+        }
+
+        try {
+            new AssignmentMetadata("admin", null, "Test");
+            System.out.println("FAIL - Should have thrown exception for null assignedAt");
+        } catch (IllegalArgumentException e) {
+            System.out.println("OK - Null assignedAt validation: " + e.getMessage());
+        }
+
+        try {
+            new AssignmentMetadata("", "2026-02-15 10:30:00", "Test");
+            System.out.println("FAIL - Should have thrown exception for empty assignedBy");
+        } catch (IllegalArgumentException e) {
+            System.out.println("OK - Empty assignedBy validation: " + e.getMessage());
+        }
+
+        try {
+            new AssignmentMetadata("admin", "", "Test");
+            System.out.println("FAIL - Should have thrown exception for empty assignedAt");
+        } catch (IllegalArgumentException e) {
+            System.out.println("OK - Empty assignedAt validation: " + e.getMessage());
+        }
+        System.out.println();
+
+        System.out.println("Test 6: Accessor methods");
+        AssignmentMetadata meta5 = AssignmentMetadata.now("system", "Automated assignment");
+        System.out.println("  assignedBy: " + meta5.assignedBy());
+        System.out.println("  assignedAt: " + meta5.assignedAt());
+        System.out.println("  reason: " + meta5.reason());
+        System.out.println();
+
+        System.out.println("Test 7: equals and hashCode");
+        AssignmentMetadata meta6 = AssignmentMetadata.now("admin", "Test");
+        AssignmentMetadata meta7 = new AssignmentMetadata(meta6.assignedBy(), meta6.assignedAt(), meta6.reason());
+        System.out.println("  meta6.equals(meta7): " + meta6.equals(meta7));
+        System.out.println("  meta6.hashCode() == meta7.hashCode(): " + (meta6.hashCode() == meta7.hashCode()));
+
+        AssignmentMetadata meta8 = AssignmentMetadata.now("different", "Different");
+        System.out.println("  meta6.equals(meta8): " + meta6.equals(meta8));
+        System.out.println();
+
+        System.out.println("Test 8: Different date formats");
+        AssignmentMetadata meta9 = new AssignmentMetadata("admin", "2026-02-15", "Date only");
+        AssignmentMetadata meta10 = new AssignmentMetadata("admin", "2026-02-15T10:30:00", "ISO format");
+        AssignmentMetadata meta11 = new AssignmentMetadata("admin", "15/02/2026 10:30", "European format");
+
+        System.out.println("  " + meta9.format());
+        System.out.println("  " + meta10.format());
+        System.out.println("  " + meta11.format());
     }
 }
 

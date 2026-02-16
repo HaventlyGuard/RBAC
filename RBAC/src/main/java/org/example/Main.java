@@ -1,7 +1,11 @@
 package org.example;
 
 import Models.Permission;
+import Models.Role;
 import Models.User;
+
+import java.util.HashSet;
+import java.util.Set;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -148,6 +152,120 @@ public class Main {
                 System.out.println(" Found: " + p.format());
             }
         }
+
+        System.out.println("=== Testing Role Record ===\n");
+
+        Permission readUsers = new Permission("READ", "users", "Can view user list");
+        Permission writeUsers = new Permission("WRITE", "users", "Can create and edit users");
+        Permission deleteUsers = new Permission("DELETE", "users", "Can delete users");
+        Permission readReports = new Permission("READ", "reports", "Can view reports");
+        Permission writeReports = new Permission("WRITE", "reports", "Can create and edit reports");
+
+        System.out.println("Test 1: Creating a role");
+        Role adminRole = new Role("Administrator", "Full system access");
+        System.out.println("OK - Role created: " + adminRole);
+        System.out.println("  ID: " + adminRole.id());
+        System.out.println();
+
+        System.out.println("Test 2: Adding permissions");
+        adminRole = adminRole.addPermission(readUsers)
+                .addPermission(writeUsers)
+                .addPermission(deleteUsers)
+                .addPermission(readReports)
+                .addPermission(writeReports);
+        System.out.println("OK - Added 5 permissions");
+        System.out.println("  Current permissions count: " + adminRole.permissions().size());
+        System.out.println();
+
+        System.out.println("Test 3: Checking permissions");
+        System.out.println("  hasPermission(READ, users): " +
+                adminRole.hasPermission("READ", "users"));
+        System.out.println("  hasPermission(WRITE, users): " +
+                adminRole.hasPermission("WRITE", "users"));
+        System.out.println("  hasPermission(DELETE, reports): " +
+                adminRole.hasPermission("DELETE", "reports"));
+        System.out.println("  hasPermission(readUsers): " +
+                adminRole.hasPermission(readUsers));
+        System.out.println();
+
+        System.out.println("Test 4: Removing a permission");
+        adminRole = adminRole.removePermission(deleteUsers);
+        System.out.println("OK - Removed DELETE on users permission");
+        System.out.println("  hasPermission(DELETE, users): " +
+                adminRole.hasPermission("DELETE", "users"));
+        System.out.println("  Current permissions count: " + adminRole.permissions().size());
+        System.out.println();
+
+        System.out.println("Test 5: Creating another role");
+        Role viewerRole = new Role("Viewer", "Can view data only");
+        viewerRole = viewerRole.addPermission(readUsers)
+                .addPermission(readReports);
+        System.out.println("OK - Role created: " + viewerRole);
+        System.out.println("  ID: " + viewerRole.id());
+        System.out.println();
+
+        System.out.println("Test 6: Format() method output");
+        System.out.println("Administrator role format:");
+        System.out.println(adminRole.format());
+
+        System.out.println("Viewer role format:");
+        System.out.println(viewerRole.format());
+
+        System.out.println("Test 7: Testing equals and hashCode");
+        Role sameRole = new Role(adminRole.id(), "Different Name", "Different Desc",
+                new HashSet<>());
+        System.out.println("  adminRole.equals(sameRole): " + adminRole.equals(sameRole));
+        System.out.println("  adminRole.hashCode() == sameRole.hashCode(): " +
+                (adminRole.hashCode() == sameRole.hashCode()));
+
+        System.out.println("  adminRole.equals(viewerRole): " +
+                adminRole.equals(viewerRole));
+        System.out.println();
+
+        System.out.println("Test 8: Validation tests");
+        try {
+            new Role("", "Description");
+            System.out.println("  FAIL - Should have thrown exception for empty name");
+        } catch (IllegalArgumentException e) {
+            System.out.println("  OK - Empty name validation: " + e.getMessage());
+        }
+
+        try {
+            new Role("Admin", "");
+            System.out.println("  FAIL - Should have thrown exception for empty description");
+        } catch (IllegalArgumentException e) {
+            System.out.println("  OK - Empty description validation: " + e.getMessage());
+        }
+
+        try {
+            adminRole.addPermission(null);
+            System.out.println("  FAIL - Should have thrown exception for null permission");
+        } catch (IllegalArgumentException e) {
+            System.out.println("  OK - Null permission validation: " + e.getMessage());
+        }
+        System.out.println();
+
+        System.out.println("Test 9: Unmodifiable collection test");
+        Set<Permission> perms = adminRole.getPermissions();
+        try {
+            perms.add(readUsers);
+            System.out.println("  FAIL - Should have thrown exception for modification");
+        } catch (UnsupportedOperationException e) {
+            System.out.println("  OK - getPermissions() returns unmodifiable collection");
+        }
+        System.out.println();
+
+        System.out.println("Test 10: Creating role with explicit ID");
+        Set<Permission> savedPermissions = new HashSet<>();
+        savedPermissions.add(readUsers);
+        savedPermissions.add(writeUsers);
+
+        Role restoredRole = new Role("role_restored_123", "Restored Role",
+                "Role restored from storage", savedPermissions);
+        System.out.println("OK - Restored role: " + restoredRole);
+        System.out.println("  ID: " + restoredRole.id());
+        System.out.println("  Name: " + restoredRole.name());
+        System.out.println("  Permissions count: " + restoredRole.permissions().size());
     }
 }
 

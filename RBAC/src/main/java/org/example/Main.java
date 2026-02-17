@@ -1,10 +1,9 @@
 package org.example;
 
-import Models.AssignmentMetadata;
-import Models.Permission;
-import Models.Role;
-import Models.User;
+import Models.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -350,6 +349,70 @@ public class Main {
         System.out.println("  " + meta9.format());
         System.out.println("  " + meta10.format());
         System.out.println("  " + meta11.format());
+
+
+
+        System.out.println(" Testing TemporaryAssignment.isActive() \n");
+
+        User user = new User("john_doe", "John Doe", "john@example.com");
+        Permission perm = new Permission("READ", "reports", "Can read reports");
+        Role role = new Role("Viewer", "Can view reports");
+        role = role.addPermission(perm);
+        AssignmentMetadata metadata = AssignmentMetadata.now("admin", "Temporary access");
+
+        // Тест 1:Дата в будущем
+        System.out.println("Test 1: Future date");
+        String futureDate = LocalDateTime.now().plusDays(7).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        TemporaryAssignment future = new TemporaryAssignment(user, role, metadata, futureDate, false);
+
+        System.out.println("  Expires at: " + futureDate);
+        System.out.println("  isActive(): " + future.isActive()); // Должно быть true
+        System.out.println("  isExpired(): " + future.isExpired()); // Должно быть false
+        System.out.println();
+
+        System.out.println("Test 2: Past date");
+        String pastDate = LocalDateTime.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        TemporaryAssignment past = new TemporaryAssignment(user, role, metadata, pastDate, false);
+
+        System.out.println("  Expires at: " + pastDate);
+        System.out.println("  isActive(): " + past.isActive()); // Должно быть false
+        System.out.println("  isExpired(): " + past.isExpired()); // Должно быть true
+        System.out.println();
+
+        System.out.println("Test 3: Exact date comparison");
+        String exactDate = LocalDateTime.now().plusHours(2).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        TemporaryAssignment exact = new TemporaryAssignment(user, role, metadata, exactDate, false);
+
+        System.out.println("  Expires at: " + exactDate);
+        System.out.println("  Now is before expiry? " + exact.isActive()); // Должно быть true
+        System.out.println();
+
+        System.out.println("Test 4: Testing with custom time");
+        LocalDateTime testTime = LocalDateTime.of(2026, 2, 15, 10, 30);
+        TemporaryAssignment test = new TemporaryAssignment(user, role, metadata, "2026-02-15 12:00", false);
+
+        System.out.println("  Expires at: 2026-02-15 12:00");
+        System.out.println("  Test time: " + testTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        System.out.println("  isActive(testTime): " + test.isActive(testTime)); // true (10:30 < 12:00)
+
+        LocalDateTime testTime2 = LocalDateTime.of(2026, 2, 15, 13, 00);
+        System.out.println("  Test time: " + testTime2.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        System.out.println("  isActive(testTime2): " + test.isActive(testTime2)); // false (13:00 > 12:00)
+        System.out.println();
+
+        System.out.println("Test 5: Boundary cases");
+
+        String nowStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        TemporaryAssignment now = new TemporaryAssignment(user, role, metadata, nowStr, false);
+        System.out.println("  Expires now: " + nowStr);
+        System.out.println("  isActive(): " + now.isActive()); // Зависит от микросекунд
+
+        try {
+            new TemporaryAssignment(user, role, metadata, "2026/02/15", false);
+            System.out.println("  FAIL - Should have thrown exception for invalid format");
+        } catch (IllegalArgumentException e) {
+            System.out.println("  OK - Invalid format caught: " + e.getMessage());
+        }
     }
 }
 

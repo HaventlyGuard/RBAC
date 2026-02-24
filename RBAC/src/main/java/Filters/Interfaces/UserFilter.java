@@ -1,4 +1,4 @@
-package Filters;
+package Filters.Interfaces;
 import Models.User;
 import java.util.function.Predicate;
 

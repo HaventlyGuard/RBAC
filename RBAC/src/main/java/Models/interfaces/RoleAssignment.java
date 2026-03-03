@@ -11,4 +11,14 @@ public interface RoleAssignment {
     AssignmentMetadata metadata();
     boolean isActive();
     String assignmentType();
+    default String summary() {
+        return String.format("[%s] %s assigned to %s by %s at %s - Status: %s",
+                assignmentType(),
+                role().name(),
+                user().username(),
+                metadata().assignedBy(),
+                metadata().assignedAt(),
+                isActive() ? "ACTIVE" : "INACTIVE"
+        );
+    }
 }

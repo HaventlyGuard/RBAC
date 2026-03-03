@@ -11,12 +11,12 @@ public class RoleManager implements IRepository<Role> {
 
     private final Map<String, Role> rolesById;
     private final Map<String, Role> rolesByName;
-    private final AssignmentManager assignmentManager; // For checking role usage
+    private final AssignmentManager assignmentManager;
 
     public RoleManager() {
         this.rolesById = new HashMap<>();
         this.rolesByName = new HashMap<>();
-        this.assignmentManager = null; // Will be set later
+        this.assignmentManager = null;
     }
 
     public RoleManager(AssignmentManager assignmentManager) {
@@ -26,7 +26,6 @@ public class RoleManager implements IRepository<Role> {
     }
 
     public void setAssignmentManager(AssignmentManager assignmentManager) {
-        // This is a workaround for circular dependency
         try {
             java.lang.reflect.Field field = this.getClass().getDeclaredField("assignmentManager");
             field.setAccessible(true);

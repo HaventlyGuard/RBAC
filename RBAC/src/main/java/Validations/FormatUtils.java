@@ -35,28 +35,28 @@ public class FormatUtils {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(buildSeparator(colWidths, "┌", "┬", "┐"));
+        sb.append(buildSeparator(colWidths, "+", "+", "+"));
         sb.append("\n");
 
-        sb.append("│");
+        sb.append("|");
         for (int i = 0; i < headers.length; i++) {
-            sb.append(" ").append(padRight(headers[i], colWidths[i] - 2)).append(" │");
+            sb.append(" ").append(padRight(headers[i], colWidths[i] - 2)).append(" |");
         }
         sb.append("\n");
 
-        sb.append(buildSeparator(colWidths, "├", "┼", "┤"));
+        sb.append(buildSeparator(colWidths, "+", "+", "+"));
         sb.append("\n");
 
         for (String[] row : rows) {
-            sb.append("│");
+            sb.append("|");
             for (int i = 0; i < headers.length; i++) {
                 String cell = (i < row.length && row[i] != null) ? row[i] : "";
-                sb.append(" ").append(padRight(cell, colWidths[i] - 2)).append(" │");
+                sb.append(" ").append(padRight(cell, colWidths[i] - 2)).append(" |");
             }
             sb.append("\n");
         }
 
-        sb.append(buildSeparator(colWidths, "└", "┴", "┘"));
+        sb.append(buildSeparator(colWidths, "+", "+", "+"));
 
         return sb.toString();
     }
@@ -65,7 +65,7 @@ public class FormatUtils {
         StringBuilder sb = new StringBuilder(left);
         for (int i = 0; i < widths.length; i++) {
             for (int j = 0; j < widths[i]; j++) {
-                sb.append("─");
+                sb.append("-");
             }
             if (i < widths.length - 1) {
                 sb.append(middle);
@@ -84,21 +84,21 @@ public class FormatUtils {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("┌─");
+        sb.append("+-");
         for (int i = 0; i < maxLength; i++) {
-            sb.append("─");
+            sb.append("-");
         }
-        sb.append("─┐\n");
+        sb.append("-+\n");
 
         for (String line : lines) {
-            sb.append("│ ").append(padRight(line, maxLength)).append(" │\n");
+            sb.append("| ").append(padRight(line, maxLength)).append(" |\n");
         }
 
-        sb.append("└─");
+        sb.append("+-");
         for (int i = 0; i < maxLength; i++) {
-            sb.append("─");
+            sb.append("-");
         }
-        sb.append("─┘");
+        sb.append("-+");
 
         return sb.toString();
     }

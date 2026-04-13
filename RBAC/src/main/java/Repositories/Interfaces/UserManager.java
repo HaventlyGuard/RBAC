@@ -79,9 +79,18 @@ public class UserManager implements IRepository<User> {
     }
 
     public List<User> findByFilter(UserFilter filter) {
-        Objects.requireNonNull(filter, "Filter cannot be null");
-        return usersByUsername.values().stream()
-                .filter(filter)
+        List<User> result = new ArrayList<>();
+        for (User user : usersByUsername.values()) {
+            if (filter.test(user)) {
+                result.add(user);
+            }
+        }
+        return result;
+    }
+
+    public List<User> findByFilterParallel(UserFilter filter) {
+        return usersByUsername.values().parallelStream()
+                .filter(user -> filter.test(user))
                 .collect(Collectors.toList());
     }
 

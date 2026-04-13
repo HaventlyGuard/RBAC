@@ -6,8 +6,8 @@ import Repositories.Interfaces.AssignmentManager;
 import Repositories.Interfaces.RoleManager;
 import Repositories.Interfaces.UserManager;
 
-
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,7 +22,6 @@ public class RBACSystem {
         this.userManager = new UserManager();
         this.roleManager = new RoleManager();
         this.assignmentManager = new AssignmentManager(userManager, roleManager);
-        this.roleManager.setAssignmentManager(assignmentManager);
         this.currentUser = "system";
     }
 
@@ -70,17 +69,14 @@ public class RBACSystem {
                 .addPermission(readReports)
                 .addPermission(writeReports);
 
-        // Add roles to manager
         roleManager.add(adminRole);
         roleManager.add(managerRole);
         roleManager.add(viewerRole);
         roleManager.add(reporterRole);
 
-        // Create admin user
         User admin = User.validate("admin", "System Administrator", "admin@rbac.local");
         userManager.add(admin);
 
-        // Create test users
         User john = User.validate("john_doe", "John Doe", "john@example.com");
         User jane = User.validate("jane_smith", "Jane Smith", "jane@company.com");
         User bob = User.validate("bob_wilson", "Bob Wilson", "bob@example.com");
@@ -89,10 +85,9 @@ public class RBACSystem {
         userManager.add(jane);
         userManager.add(bob);
 
-
         AssignmentMetadata reporterMeta = AssignmentMetadata.now("system", "Temporary reporter access");
-        String expiresAt = LocalDateTime.now().plusMonths(1).format(
-                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String expiresAt = LocalDateTime.now().plusMonths(1).format(formatter);
         TemporaryAssignment reporterAssignment = new TemporaryAssignment(bob, reporterRole, reporterMeta, expiresAt, false);
         assignmentManager.add(reporterAssignment);
 
@@ -128,7 +123,6 @@ public class RBACSystem {
         StringBuilder sb = new StringBuilder();
         sb.append("\n RBAC System Statistics \n\n");
 
-        // Basic counts
         int userCount = userManager.count();
         int roleCount = roleManager.count();
         int assignmentCount = assignmentManager.count();
@@ -141,7 +135,6 @@ public class RBACSystem {
         sb.append(String.format("  - Active: %d\n", activeAssignments));
         sb.append(String.format("  - Expired/Inactive: %d\n\n", expiredAssignments));
 
-        // Average roles per user
         if (userCount > 0) {
             Map<User, List<RoleAssignment>> userAssignments = new HashMap<>();
             for (User user : userManager.findAll()) {

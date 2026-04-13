@@ -91,9 +91,18 @@ public class AssignmentManager implements IRepository<RoleAssignment> {
     }
 
     public List<RoleAssignment> findByFilter(AssignmentFilter filter) {
-        Objects.requireNonNull(filter, "Filter cannot be null");
-        return assignmentsById.values().stream()
-                .filter(filter)
+        List<RoleAssignment> result = new ArrayList<>();
+        for (RoleAssignment assignment : assignmentsById.values()) {
+            if (filter.test(assignment)) {
+                result.add(assignment);
+            }
+        }
+        return result;
+    }
+
+    public List<RoleAssignment> findByFilterParallel(AssignmentFilter filter) {
+        return assignmentsById.values().parallelStream()
+                .filter(assignment -> filter.test(assignment))
                 .collect(Collectors.toList());
     }
 

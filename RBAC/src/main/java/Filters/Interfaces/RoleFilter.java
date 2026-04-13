@@ -1,11 +1,9 @@
 package Filters.Interfaces;
 
 import Models.Role;
-import java.util.function.Predicate;
 
 @FunctionalInterface
-public interface RoleFilter extends Predicate<Role> {
-
+public interface RoleFilter {
     boolean test(Role role);
 
     default RoleFilter and(RoleFilter other) {

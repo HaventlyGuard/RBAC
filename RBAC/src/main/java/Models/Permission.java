@@ -2,12 +2,17 @@ package Models;
 
 import java.util.Objects;
 
-public record Permission(String name, String resource, String description) {
+public class Permission {
+    public String _name;
+    public String _resource;
+    public String _description;
 
-    public Permission {
+
+    public Permission (String name, String resource, String description){
         if (name == null) {
             throw new IllegalArgumentException("Permission name cannot be null");
         }
+
 
         String trimmedName = name.trim();
         if (trimmedName.isEmpty()) {
@@ -55,10 +60,13 @@ public record Permission(String name, String resource, String description) {
         if (trimmedDescription.isEmpty()) {
             throw new IllegalArgumentException("Description cannot be empty");
         }
+        _description = description;
+        _name = name;
+        _resource = resource;
     }
 
     public String format() {
-        return String.format("%s on %s: %s", name, resource, description);
+        return _name + " on " + _resource + ": " + _description;
     }
 
     public boolean matches(String namePattern, String resourcePattern) {
@@ -67,7 +75,7 @@ public record Permission(String name, String resource, String description) {
             nameMatches = true;
         } else {
             String pattern = namePattern.trim().toUpperCase();
-            nameMatches = containsIgnoreCase(this.name, pattern);
+            nameMatches = containsIgnoreCase(this._name, pattern);
         }
 
         boolean resourceMatches;
@@ -75,10 +83,22 @@ public record Permission(String name, String resource, String description) {
             resourceMatches = true;
         } else {
             String pattern = resourcePattern.trim().toLowerCase();
-            resourceMatches = containsIgnoreCase(this.resource, pattern);
+            resourceMatches = containsIgnoreCase(this._resource, pattern);
         }
 
         return nameMatches && resourceMatches;
+    }
+
+    public String name() {
+        return _name;
+    }
+
+    public String resource() {
+        return _resource;
+    }
+
+    public String description() {
+        return _description;
     }
 
     private boolean containsIgnoreCase(String text, String pattern) {
@@ -109,13 +129,13 @@ public record Permission(String name, String resource, String description) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Permission that = (Permission) o;
-        return Objects.equals(name, that.name) &&
-                Objects.equals(resource, that.resource) &&
-                Objects.equals(description, that.description);
+        return Objects.equals(_name, that._name) &&
+                Objects.equals(_resource, that._resource) &&
+                Objects.equals(_description, that._description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, resource, description);
+        return Objects.hash(_name, _resource, _description);
     }
 }

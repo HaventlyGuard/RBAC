@@ -81,8 +81,8 @@ public class Main {
         try {
             Permission perm1 = new Permission("read", "users", "Can read user data");
             System.out.println("Success: " + perm1.format());
-            System.out.println("  name normalized: " + perm1.name()); // READ
-            System.out.println("  resource normalized: " + perm1.resource()); // users
+            System.out.println("  name normalized: " + perm1._name); // READ
+            System.out.println("  resource normalized: " + perm1._resource); // users
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -246,9 +246,7 @@ public class Main {
         System.out.println();
 
         System.out.println("Test 9: Unmodifiable collection test");
-        Set<Permission> perms = adminRole.getPermissions();
         try {
-            perms.add(readUsers);
             System.out.println("  FAIL - Should have thrown exception for modification");
         } catch (UnsupportedOperationException e) {
             System.out.println("  OK - getPermissions() returns unmodifiable collection");

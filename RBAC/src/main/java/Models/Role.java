@@ -2,11 +2,43 @@ package Models;
 
 import java.util.*;
 
-public record Role(String id, String name, String description, Set<Permission> permissions) {
+public class Role {
+    private final String id;
+    private String name;
+    private String description;
+    private final Set<Permission> permissions;
 
-    public Role {
-        Objects.requireNonNull(id, "ID cannot be null");
+    public Role(String name, String description) {
+        this.id = generateId();
+        setName(name);
+        setDescription(description);
+        this.permissions = new HashSet<>();
+    }
 
+    public Role(String id, String name, String description, Set<Permission> permissions) {
+        this.id = id;
+        setName(name);
+        setDescription(description);
+        this.permissions = new HashSet<>(permissions);
+    }
+
+    private String generateId() {
+        return "role_" + UUID.randomUUID().toString();
+    }
+
+    public String id() {
+        return id;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public void setName(String name) {
         if (name == null) {
             throw new IllegalArgumentException("Role name cannot be null");
         }
@@ -14,8 +46,10 @@ public record Role(String id, String name, String description, Set<Permission> p
         if (trimmedName.isEmpty()) {
             throw new IllegalArgumentException("Role name cannot be empty");
         }
-        name = trimmedName;
+        this.name = trimmedName;
+    }
 
+    public void setDescription(String description) {
         if (description == null) {
             throw new IllegalArgumentException("Description cannot be null");
         }
@@ -23,40 +57,20 @@ public record Role(String id, String name, String description, Set<Permission> p
         if (trimmedDesc.isEmpty()) {
             throw new IllegalArgumentException("Description cannot be empty");
         }
-        description = trimmedDesc;
-
-        Objects.requireNonNull(permissions, "Permissions set cannot be null");
-    }
-
-    public Role(String name, String description) {
-        this(generateId(), name, description, new HashSet<>());
-    }
-
-    private static String generateId() {
-        return "role_" + UUID.randomUUID().toString();
-    }
-
-    public Role withName(String name) {
-        return new Role(this.id, name, this.description, this.permissions);
-    }
-
-    public Role withDescription(String description) {
-        return new Role(this.id, this.name, description, this.permissions);
+        this.description = trimmedDesc;
     }
 
     public Role addPermission(Permission permission) {
         if (permission == null) {
             throw new IllegalArgumentException("Permission cannot be null");
         }
-        Set<Permission> newPermissions = new HashSet<>(this.permissions);
-        newPermissions.add(permission);
-        return new Role(this.id, this.name, this.description, newPermissions);
+        permissions.add(permission);
+        return this;
     }
 
     public Role removePermission(Permission permission) {
-        Set<Permission> newPermissions = new HashSet<>(this.permissions);
-        newPermissions.remove(permission);
-        return new Role(this.id, this.name, this.description, newPermissions);
+        permissions.remove(permission);
+        return this;
     }
 
     public boolean hasPermission(Permission permission) {
@@ -73,7 +87,7 @@ public record Role(String id, String name, String description, Set<Permission> p
         return false;
     }
 
-    public Set<Permission> getPermissions() {
+    public Set<Permission> permissions() {
         return Collections.unmodifiableSet(permissions);
     }
 
@@ -102,5 +116,18 @@ public record Role(String id, String name, String description, Set<Permission> p
     public String toString() {
         return String.format("Role{id='%s', name='%s', permissions=%d}",
                 id, name, permissions.size());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Role role = (Role) o;
+        return Objects.equals(id, role.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

@@ -2,12 +2,18 @@ package Models;
 
 import java.util.regex.Pattern;
 
-public record User(String username, String fullName, String email) {
+public class User {
+    private String _username;
+    private String _fullName;
+    private String _email;
 
-    public User {
+    public User(String username, String fullName, String email) {
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("Username cannot be null or empty");
         }
+        _username = username;
+        _email = email;
+        _fullName = fullName;
 
         String trimmedUsername = username.trim();
         if (trimmedUsername.length() < 3 || trimmedUsername.length() > 20) {
@@ -46,12 +52,23 @@ public record User(String username, String fullName, String email) {
             throw new IllegalArgumentException("Email must contain a dot after @ with at least one character after it");
         }
     }
+    public String username() {
+        return _username;
+    }
+
+    public String fullName() {
+        return _fullName;
+    }
+
+    public String email() {
+        return _email;
+    }
 
     public static User validate(String username, String fullName, String email) {
         return new User(username, fullName, email);
     }
 
     public String format() {
-        return String.format("%s (%s) <%s>", username, fullName, email);
+        return String.format("%s (%s) <%s>", _username, _fullName, _email);
     }
 }

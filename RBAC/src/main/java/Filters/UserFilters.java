@@ -1,6 +1,7 @@
 package Filters;
 
 import Filters.Interfaces.UserFilter;
+import Models.User;
 
 public class UserFilters {
 
@@ -47,5 +48,9 @@ public class UserFilters {
             }
         }
         return false;
+    }
+
+    public static boolean test(User user) {
+        return true;
     }
 }
